@@ -1,0 +1,50 @@
+import turtle
+import pandas
+# function to show states on the map
+def show_states(color,state_name):
+    one_state = turtle.Turtle("circle")
+    one_state.shapesize(0.2)
+    one_state.penup()
+    one_state.color(color)
+    one_state.goto(state.x.item(), state.y.item())
+    one_state.write(state_name)
+
+#set the screen
+screen = turtle.Screen()
+screen.title("U.S. States Game")
+screen.bgpic("blank_states_img.gif")
+score = 0
+
+#read answer keys (states' name, coordinates)
+answer = pandas.read_csv("50_states.csv")
+all_states = answer.state.to_list()
+guessed_states = []
+states_to_learn = []
+
+# Ask for user to guess a state until all 50 states were guessed.
+while len(guessed_states) < 50:
+    answer_state = screen.textinput(f"Guess States: {len(guessed_states)}/50", "State Name: ").title()
+
+# Show the states user just guessed on the map
+    if answer_state in all_states:
+        guessed_states.append(answer_state)
+        state = answer[answer.state == answer_state]
+        show_states("black", answer_state)
+
+    #Secret command to exit the game and show all the missing states.
+    if answer_state == "Exit":
+        missing_states = [state for state in all_states if state not in guessed_states]
+
+        # Export a csv file with all the missing states.
+        new_data = pandas.DataFrame(missing_states)
+        new_data.to_csv("states_to_learn.csv")
+        break
+
+# Show all the missing states in red on the map
+for states in all_states:
+    if states not in guessed_states:
+        states_to_learn.append(states)
+        state = answer[answer.state == states]
+        show_states("red", states)
+
+screen.mainloop()
